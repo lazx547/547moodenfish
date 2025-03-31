@@ -3,5 +3,8 @@
         <file>main.qml</file>
         <file>images/fish.png</file>
         <file>GButton.qml</file>
+        <file>ColorPicker.qml</file>
+        <file>images/Qt.png</file>
+        <file>images/547.png</file>
     </qresource>
 </RCC>

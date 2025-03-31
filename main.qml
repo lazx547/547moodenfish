@@ -23,8 +23,6 @@ Window {
         text_.anchors.verticalCenterOffset=-30
         text_.visible=false
     }
-
-
     DragHandler {
         grabPermissions: TapHandler.CanTakeOverFromAnything
         onActiveChanged: if (active) { window.startSystemMove() }
@@ -36,35 +34,37 @@ Window {
         id:win
         transformOrigin: Item.TopLeft
         Image{
-            id:fish
+            id:fish_
             anchors.fill: parent
-            scale: 0.8
             source:"qrc:/images/fish.png"
-            property bool click:false
-            property bool onNA:false
-            NumberAnimation on scale {
-                running: fish.click
-                duration: 100
-                to: 1.0
-                onStarted: fish.onNA=true
-                onStopped: fish.click=false
-            }
-
-            NumberAnimation on scale {
-                running: !fish.click
-                duration: 250
-                easing.type: Easing.OutBack
-                easing.overshoot: 1.0
-                to: 0.8
-                onStopped:fish.onNA=false
-            }
-            ColorOverlay{
-                    anchors.fill: parent
-                    color: Qt.rgba(pick_d.r,pick_d.g,pick_d.b,pick_d.a)
-                    source: parent
-                    visible: true
-                }
+            visible: false
         }
+        ColorOverlay{
+                anchors.fill: fish_
+                id:fish
+                scale: 0.8
+                property bool click:false
+                property bool onNA:false
+                color: Qt.rgba(pick_d.r,pick_d.g,pick_d.b,pick_d.a)
+                source: fish_
+                visible: true
+                NumberAnimation on scale {
+                    running: fish.click
+                    duration: 100
+                    to: 1.0
+                    onStarted: fish.onNA=true
+                    onStopped: fish.click=false
+                }
+
+                NumberAnimation on scale {
+                    running: !fish.click
+                    duration: 250
+                    easing.type: Easing.OutBack
+                    easing.overshoot: 1.0
+                    to: 0.8
+                    onStopped:fish.onNA=false
+                }
+            }
         Text{
             anchors.centerIn: parent
             anchors.verticalCenterOffset: -30
@@ -105,7 +105,7 @@ Window {
             color:Qt.rgba(pick_f.r,pick_f.g,pick_f.b,pick_f.a)
             Component.onCompleted:
             {
-                num=file.read_()
+                num=file.read_g()
                 text="功德:"+num
             }
         }
@@ -163,7 +163,8 @@ Window {
             source="./547.dll"
             write(n)
         }
-        function read_(){
+        function read_g()
+        {
             source="./547.dll"
             return read()
         }
@@ -173,18 +174,16 @@ Window {
         icon.source: "qrc:/images/547.png"
         id:tray
         menu: Menu {
-
             MenuItemGroup{
                 id:sys_a
             }
-
             MenuItem {
                 id:sys_top
                 text: qsTr("置顶")
                 checkable: true
                 checked: false
                 group: sys_a
-                onCheckedChanged: top_.checked=checked
+                onCheckedChanged: window.flags=Qt.FramelessWindowHint|Qt.WindowStaysOnTopHint
             }
             MenuItem {
                 id:sys_dow
@@ -193,7 +192,6 @@ Window {
                 checked: true
                 group: sys_a
                 onCheckedChanged: {
-                    top_.checked=!checked
                     if(checked)
                         window.flags=Qt.FramelessWindowHint|Qt.WindowStaysOnBottomHint
                     else
@@ -231,7 +229,7 @@ Window {
         id:yjcd
         flags:Qt.FramelessWindowHint|Qt.WindowStaysOnTopHint//无边框 最上层
         width: 124
-        height: 164
+        height: 139
         color: "#00000000"
         property bool pick_:false
         onActiveFocusItemChanged: {//失去焦点时隐藏
@@ -253,7 +251,7 @@ Window {
             GButton{
                 width: cd.width
                 height: 20
-                y:140
+                y:115
                 text:"关闭"
                 radiusBg: 0
                 toolTipText: "关闭"
@@ -261,31 +259,9 @@ Window {
                 onClicked: Qt.quit()
             }
             GButton{
-                id:top_
-                width: cd.width
+                width: cd.width/2
                 height: 20
-                y:80
-                text:"不置顶"
-                radiusBg: 0
-                toolTipText: "置顶"
-                checkable: true
-                checked: false
-                onCheckedChanged: {
-                    if(checked){
-                        window.flags=Qt.FramelessWindowHint|Qt.WindowStaysOnTopHint
-                        text="置顶"
-                    }
-                    else
-                    {
-                        window.flags=Qt.FramelessWindowHint
-                        text="不置顶"
-                    }
-                }
-            }
-            GButton{
-                width: cd.width
-                height: 20
-                y:100
+                y:95
                 text:"最小化"
                 radiusBg: 0
                 toolTipText: "最小化"
@@ -295,10 +271,17 @@ Window {
                     sys_sh.checked=true
                 }
             }
+            GScrollBar{
+                y:80
+                text:"A"
+                onValueChanged: window.opacity=value*0.99+0.01
+            }
+
             GButton{
-                width: cd.width
+                width: cd.width/2
+                x:cd.width/2
                 height: 20
-                y:120
+                y:95
                 text:"关于"
                 radiusBg: 0
                 toolTipText: "关于"
@@ -321,7 +304,7 @@ Window {
                         x:90
                         y:25
                         font.pixelSize: 20
-                        text:"Made with Qt6"
+                        text:"Made with Qt6 (qml)"
                     }
                     Text {
                         x:90
@@ -336,6 +319,7 @@ Window {
                         y:80
                         height: 20
                         onClicked: Qt.openUrlExternally("https://github.com/lazx547/547clock")
+                        toolTipText: "打开github"
                     }
                     GButton{
                         text:"547官网"
@@ -345,6 +329,7 @@ Window {
                         y:80
                         height: 20
                         onClicked: Qt.openUrlExternally("https://lazx547.github.io")
+                        toolTipText: "打开547官网"
                     }
                 }
                 onClicked:about.visible=true
@@ -423,7 +408,7 @@ Window {
                             if(!activeFocusItem && !yjcd.active)
                                 visible=false
                         }
-                        Component.onCompleted: setColor(0,0,0,1)
+                        Component.onCompleted: setColor(0,134/255,1,1)
                         onVisibleChanged: {
                             if(visible)pick_f_b.text="<"
                             else pick_f_b.text=">"
@@ -462,7 +447,7 @@ Window {
                             if(!activeFocusItem && !yjcd.active)
                                 visible=false
                         }
-                        Component.onCompleted: setColor(1,1,1,1)
+                        Component.onCompleted: setColor(129/255,90/255,0,1)
                         onVisibleChanged: {
                             if(visible)pick_d_b.text="<"
                             else pick_d_b.text=">"

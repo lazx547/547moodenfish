@@ -6,5 +6,6 @@
         <file>ColorPicker.qml</file>
         <file>images/Qt.png</file>
         <file>images/547.png</file>
+        <file>GScrollBar.qml</file>
     </qresource>
 </RCC>
